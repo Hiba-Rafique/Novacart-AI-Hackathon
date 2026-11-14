@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     embedding_dimensions: int = 768
     model_timeout_seconds: float = 20.0
     max_model_concurrency: int = 3
-    rag_top_k: int = 10
+    rag_top_k: int = 15
 
     policies_dir: Path = REPO_ROOT / "policies"
     data_dir: Path = APP_ROOT / "data"
