@@ -4,6 +4,7 @@ from typing import Any
 
 from policyguard.config import Settings
 from policyguard.finance import Clock, SystemClock, resolve_contact_date
+from policyguard.policy import precedence_context
 from policyguard.retrieval import Retriever
 from policyguard.schemas import (
     AnswerPartResponse,
@@ -49,6 +50,7 @@ class PolicyService:
         prompt_facts: dict[str, Any] = facts.model_dump(mode="json", exclude_none=True)
         prompt_facts["resolved_contact_date"] = resolution.contact_date.isoformat()
         prompt_facts["resolved_contact_date_source"] = resolution.source
+        prompt_facts["policy_precedence"] = precedence_context(resolution.contact_date)
 
         output = await self._reasoner.analyze(request.question, prompt_facts, evidence)
         validated = validate_model_output(output, evidence)

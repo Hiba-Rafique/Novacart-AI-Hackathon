@@ -1,3 +1,4 @@
+from .context import precedence_context
 from .known_issues import (
     BUNDLE_PROMO_RULES,
     COD_LIMIT_RULES,
@@ -17,6 +18,7 @@ __all__ = [
     "SHIPPING_UPDATE_RULES",
     "PolicyRule",
     "PrecedenceOutcome",
+    "precedence_context",
     "resolve_bundle_promo",
     "resolve_cod_limit",
     "resolve_return_policy",

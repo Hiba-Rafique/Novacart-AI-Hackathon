@@ -1,7 +1,9 @@
+import json
 from datetime import date
 
 from policyguard.policy import (
     PolicyRule,
+    precedence_context,
     resolve_bundle_promo,
     resolve_cod_limit,
     resolve_return_policy,
@@ -43,6 +45,15 @@ def test_specific_bundle_rule_beats_general_promo_rule() -> None:
     assert outcome.selected is not None
     assert outcome.selected.file_name == "13_sales_and_bundles.md"
     assert "specific" in outcome.reason
+
+
+def test_precedence_context_is_prompt_safe_and_date_aware() -> None:
+    context = precedence_context(date(2027, 3, 1))
+
+    json.dumps(context)
+    assert context["shipping_fee_version"]["selected"]["value"] == "2027"
+    assert context["returns_version"]["selected"]["value"] == "2026"
+    assert len(context["cod_limit"]["conflicts"]) == 2
 
 
 def test_regional_rule_overrides_regardless_of_date() -> None:
