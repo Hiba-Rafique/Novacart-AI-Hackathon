@@ -1,0 +1,881 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-11-14T08:00:10.399163Z",
+  "corpus_hash": "fe689b6e4e1b264107454a0be5b387244d5661bf84d5bb883ad414d0605cbfae",
+  "document_count": 22,
+  "chunk_count": 270,
+  "quarantined_lines": [
+    {
+      "file_name": "03_refunds_policy.md",
+      "line_number": 20,
+      "reason": "html_comment"
+    },
+    {
+      "file_name": "06_shipping_fees_and_free_shipping.md",
+      "line_number": 22,
+      "reason": "prompt_injection"
+    },
+    {
+      "file_name": "12_promo_code_rules.md",
+      "line_number": 26,
+      "reason": "prompt_injection"
+    },
+    {
+      "file_name": "17_seller_marketplace_rules.md",
+      "line_number": 52,
+      "reason": "prompt_injection"
+    }
+  ],
+  "documents": [
+    {
+      "doc_id": "NC-POL-00",
+      "file_name": "00_how_policies_work_together.md",
+      "title": "How NovaCart Policies Work Together",
+      "version": "1.0",
+      "effective_date": "2026-01-01",
+      "last_updated": "2025-12-15",
+      "scope": "general",
+      "checksum": "ef593e9a3e68e5b182002c7dd6d9aef60796bbc0a35bdb1afe8e07c4ee518909",
+      "line_count": 88,
+      "section_count": 6,
+      "item_count": 28,
+      "cross_references": [
+        {
+          "file_number": "17",
+          "file_name": "17_seller_marketplace_rules.md",
+          "section": "1",
+          "raw": "[file 17, Section 1]"
+        },
+        {
+          "file_number": "12",
+          "file_name": "12_promo_code_rules.md",
+          "section": "1",
+          "raw": "[file 12, Section 1]"
+        },
+        {
+          "file_number": "13",
+          "file_name": "13_sales_and_bundles.md",
+          "section": "1",
+          "raw": "[file 13, Section 1]"
+        },
+        {
+          "file_number": "12",
+          "file_name": "12_promo_code_rules.md",
+          "section": "3",
+          "raw": "[file 12, Section 3]"
+        },
+        {
+          "file_number": "06",
+          "file_name": "06_shipping_fees_and_free_shipping.md",
+          "section": "2",
+          "raw": "[file 06, Section 2]"
+        },
+        {
+          "file_number": "12",
+          "file_name": "12_promo_code_rules.md",
+          "section": "5",
+          "raw": "[file 12, Section 5]"
+        },
+        {
+          "file_number": "01",
+          "file_name": "01_returns_policy.md",
+          "section": "5",
+          "raw": "[file 01, Section 5]"
+        },
+        {
+          "file_number": "03",
+          "file_name": "03_refunds_policy.md",
+          "section": null,
+          "raw": "[file 03]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-01",
+      "file_name": "01_returns_policy.md",
+      "title": "Returns Policy",
+      "version": "3.0",
+      "effective_date": "2026-03-01",
+      "last_updated": "2026-02-20",
+      "scope": "general",
+      "checksum": "3d20ca1de09f8080371915d05f7830f116deecd41a0f3ddfb60098aea4ff30b7",
+      "line_count": 76,
+      "section_count": 6,
+      "item_count": 23,
+      "cross_references": [
+        {
+          "file_number": "18",
+          "file_name": "18_seller_return_obligations.md",
+          "section": "1",
+          "raw": "[file 18, Section 1]"
+        },
+        {
+          "file_number": "07",
+          "file_name": "07_lost_or_damaged_deliveries.md",
+          "section": "1",
+          "raw": "[file 07, Section 1]"
+        },
+        {
+          "file_number": "00",
+          "file_name": "00_how_policies_work_together.md",
+          "section": "1",
+          "raw": "[file 00, Section 1]"
+        },
+        {
+          "file_number": "04",
+          "file_name": "04_non_returnable_items.md",
+          "section": "1",
+          "raw": "[file 04, Section 1]"
+        },
+        {
+          "file_number": "19",
+          "file_name": "19_remote_areas_addendum.md",
+          "section": "4",
+          "raw": "[file 19, Section 4]"
+        },
+        {
+          "file_number": "20",
+          "file_name": "20_international_addendum.md",
+          "section": "6",
+          "raw": "[file 20, Section 6]"
+        },
+        {
+          "file_number": "08",
+          "file_name": "08_warranty_policy.md",
+          "section": "4",
+          "raw": "[file 08, Section 4]"
+        },
+        {
+          "file_number": "12",
+          "file_name": "12_promo_code_rules.md",
+          "section": "6",
+          "raw": "[file 12, Section 6]"
+        },
+        {
+          "file_number": "13",
+          "file_name": "13_sales_and_bundles.md",
+          "section": "4",
+          "raw": "[file 13, Section 4]"
+        },
+        {
+          "file_number": "03",
+          "file_name": "03_refunds_policy.md",
+          "section": "2",
+          "raw": "[file 03, Section 2]"
+        },
+        {
+          "file_number": "03",
+          "file_name": "03_refunds_policy.md",
+          "section": "3",
+          "raw": "[file 03, Section 3]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-02",
+      "file_name": "02_returns_policy_2025.md",
+      "title": "Returns Policy (Version 2)",
+      "version": "2.0",
+      "effective_date": "2025-06-01",
+      "last_updated": "2025-05-20",
+      "scope": "general",
+      "checksum": "1a8f979582db4068eabe17638227eac56a2e8e7ce6566fe6fb49d53948d43c07",
+      "line_count": 62,
+      "section_count": 5,
+      "item_count": 17,
+      "cross_references": []
+    },
+    {
+      "doc_id": "NC-POL-03",
+      "file_name": "03_refunds_policy.md",
+      "title": "Refunds Policy",
+      "version": "2.0",
+      "effective_date": "2026-03-01",
+      "last_updated": "2026-02-20",
+      "scope": "general",
+      "checksum": "08a9f0b47ccc2ef94f3c75530a772a30e69dd0a48b2ce7a45db6fbdf6bc06023",
+      "line_count": 68,
+      "section_count": 5,
+      "item_count": 16,
+      "cross_references": [
+        {
+          "file_number": "01",
+          "file_name": "01_returns_policy.md",
+          "section": "5",
+          "raw": "[file 01, Section 5]"
+        },
+        {
+          "file_number": "01",
+          "file_name": "01_returns_policy.md",
+          "section": "6",
+          "raw": "[file 01, Section 6]"
+        },
+        {
+          "file_number": "07",
+          "file_name": "07_lost_or_damaged_deliveries.md",
+          "section": "2",
+          "raw": "[file 07, Section 2]"
+        },
+        {
+          "file_number": "05",
+          "file_name": "05_shipping_policy.md",
+          "section": "2.4",
+          "raw": "[file 05, Section 2.4]"
+        },
+        {
+          "file_number": "01",
+          "file_name": "01_returns_policy.md",
+          "section": "4",
+          "raw": "[file 01, Section 4]"
+        },
+        {
+          "file_number": "14",
+          "file_name": "14_store_credit.md",
+          "section": "3",
+          "raw": "[file 14, Section 3]"
+        },
+        {
+          "file_number": "14",
+          "file_name": "14_store_credit.md",
+          "section": "6",
+          "raw": "[file 14, Section 6]"
+        },
+        {
+          "file_number": "18",
+          "file_name": "18_seller_return_obligations.md",
+          "section": "2",
+          "raw": "[file 18, Section 2]"
+        },
+        {
+          "file_number": "01",
+          "file_name": "01_returns_policy.md",
+          "section": null,
+          "raw": "[file 01]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-04",
+      "file_name": "04_non_returnable_items.md",
+      "title": "Non-Returnable Items",
+      "version": "2.0",
+      "effective_date": "2026-03-01",
+      "last_updated": "2026-02-20",
+      "scope": "general",
+      "checksum": "a8a86c581049cb5908858bddc1f33c91b8afb496fefd09646343df1d72e7c7d8",
+      "line_count": 34,
+      "section_count": 4,
+      "item_count": 8,
+      "cross_references": [
+        {
+          "file_number": "01",
+          "file_name": "01_returns_policy.md",
+          "section": "2",
+          "raw": "[file 01, Section 2]"
+        },
+        {
+          "file_number": "08",
+          "file_name": "08_warranty_policy.md",
+          "section": "2",
+          "raw": "[file 08, Section 2]"
+        },
+        {
+          "file_number": "07",
+          "file_name": "07_lost_or_damaged_deliveries.md",
+          "section": "1",
+          "raw": "[file 07, Section 1]"
+        },
+        {
+          "file_number": "01",
+          "file_name": "01_returns_policy.md",
+          "section": null,
+          "raw": "[file 01]"
+        },
+        {
+          "file_number": "18",
+          "file_name": "18_seller_return_obligations.md",
+          "section": "1",
+          "raw": "[file 18, Section 1]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-05",
+      "file_name": "05_shipping_policy.md",
+      "title": "Shipping Policy",
+      "version": "2.0",
+      "effective_date": "2026-01-15",
+      "last_updated": "2026-01-05",
+      "scope": "general",
+      "checksum": "2fd36427e8c20b15301be9560eaa2b9b504a1b2fafc3853a50c1a2cc4dac7c85",
+      "line_count": 54,
+      "section_count": 5,
+      "item_count": 12,
+      "cross_references": [
+        {
+          "file_number": "17",
+          "file_name": "17_seller_marketplace_rules.md",
+          "section": "3",
+          "raw": "[file 17, Section 3]"
+        },
+        {
+          "file_number": "11",
+          "file_name": "11_cod_and_failed_payments.md",
+          "section": "3",
+          "raw": "[file 11, Section 3]"
+        },
+        {
+          "file_number": "19",
+          "file_name": "19_remote_areas_addendum.md",
+          "section": "3",
+          "raw": "[file 19, Section 3]"
+        },
+        {
+          "file_number": "20",
+          "file_name": "20_international_addendum.md",
+          "section": "4",
+          "raw": "[file 20, Section 4]"
+        },
+        {
+          "file_number": "06",
+          "file_name": "06_shipping_fees_and_free_shipping.md",
+          "section": "2",
+          "raw": "[file 06, Section 2]"
+        },
+        {
+          "file_number": "11",
+          "file_name": "11_cod_and_failed_payments.md",
+          "section": "4",
+          "raw": "[file 11, Section 4]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-06",
+      "file_name": "06_shipping_fees_and_free_shipping.md",
+      "title": "Shipping Fees and Free Shipping",
+      "version": "2.0",
+      "effective_date": "2026-01-15",
+      "last_updated": "2026-01-05",
+      "scope": "general",
+      "checksum": "b5f6e4411fcae37fd17eaca027aa3be96f49c590e5a669363f33000d05ee989e",
+      "line_count": 50,
+      "section_count": 3,
+      "item_count": 10,
+      "cross_references": [
+        {
+          "file_number": "19",
+          "file_name": "19_remote_areas_addendum.md",
+          "section": "2",
+          "raw": "[file 19, Section 2]"
+        },
+        {
+          "file_number": "20",
+          "file_name": "20_international_addendum.md",
+          "section": "4",
+          "raw": "[file 20, Section 4]"
+        },
+        {
+          "file_number": "00",
+          "file_name": "00_how_policies_work_together.md",
+          "section": "5",
+          "raw": "[file 00, Section 5]"
+        },
+        {
+          "file_number": "03",
+          "file_name": "03_refunds_policy.md",
+          "section": "2",
+          "raw": "[file 03, Section 2]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-07",
+      "file_name": "07_lost_or_damaged_deliveries.md",
+      "title": "Lost, Damaged and Wrong Deliveries",
+      "version": "2.0",
+      "effective_date": "2026-01-15",
+      "last_updated": "2026-01-05",
+      "scope": "general",
+      "checksum": "2392412fc82bc5911b3e3c466429c6e6f2b91ece1f0873cf0242e02bd76430e5",
+      "line_count": 34,
+      "section_count": 3,
+      "item_count": 9,
+      "cross_references": [
+        {
+          "file_number": "08",
+          "file_name": "08_warranty_policy.md",
+          "section": "4",
+          "raw": "[file 08, Section 4]"
+        },
+        {
+          "file_number": "03",
+          "file_name": "03_refunds_policy.md",
+          "section": "2",
+          "raw": "[file 03, Section 2]"
+        },
+        {
+          "file_number": "19",
+          "file_name": "19_remote_areas_addendum.md",
+          "section": "3",
+          "raw": "[file 19, Section 3]"
+        },
+        {
+          "file_number": "20",
+          "file_name": "20_international_addendum.md",
+          "section": "4",
+          "raw": "[file 20, Section 4]"
+        },
+        {
+          "file_number": "03",
+          "file_name": "03_refunds_policy.md",
+          "section": "3",
+          "raw": "[file 03, Section 3]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-08",
+      "file_name": "08_warranty_policy.md",
+      "title": "Warranty Policy",
+      "version": "2.0",
+      "effective_date": "2026-01-15",
+      "last_updated": "2026-01-05",
+      "scope": "general",
+      "checksum": "efe01a36b0f65014a5fe4a801ab785bfc384781f91b14da1e77645679e0b0626",
+      "line_count": 53,
+      "section_count": 6,
+      "item_count": 12,
+      "cross_references": [
+        {
+          "file_number": "18",
+          "file_name": "18_seller_return_obligations.md",
+          "section": "4",
+          "raw": "[file 18, Section 4]"
+        },
+        {
+          "file_number": "09",
+          "file_name": "09_warranty_claims.md",
+          "section": "3",
+          "raw": "[file 09, Section 3]"
+        },
+        {
+          "file_number": "00",
+          "file_name": "00_how_policies_work_together.md",
+          "section": "1",
+          "raw": "[file 00, Section 1]"
+        },
+        {
+          "file_number": "01",
+          "file_name": "01_returns_policy.md",
+          "section": null,
+          "raw": "[file 01]"
+        },
+        {
+          "file_number": "07",
+          "file_name": "07_lost_or_damaged_deliveries.md",
+          "section": null,
+          "raw": "[file 07]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-09",
+      "file_name": "09_warranty_claims.md",
+      "title": "How to Make a Warranty Claim",
+      "version": "2.0",
+      "effective_date": "2026-01-15",
+      "last_updated": "2026-01-05",
+      "scope": "general",
+      "checksum": "7b289e1e8ba388235e882fcae80061570f2f42fbd73612992ab94c64f746f924",
+      "line_count": 34,
+      "section_count": 5,
+      "item_count": 7,
+      "cross_references": [
+        {
+          "file_number": "08",
+          "file_name": "08_warranty_policy.md",
+          "section": "3",
+          "raw": "[file 08, Section 3]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-10",
+      "file_name": "10_payments.md",
+      "title": "Payments",
+      "version": "2.0",
+      "effective_date": "2026-05-01",
+      "last_updated": "2026-04-20",
+      "scope": "general",
+      "checksum": "4d0f32c96580113471eea0654df55fe45906687e9bde2b1dc32bc143b24b8409",
+      "line_count": 38,
+      "section_count": 5,
+      "item_count": 9,
+      "cross_references": [
+        {
+          "file_number": "11",
+          "file_name": "11_cod_and_failed_payments.md",
+          "section": null,
+          "raw": "[file 11]"
+        },
+        {
+          "file_number": "14",
+          "file_name": "14_store_credit.md",
+          "section": null,
+          "raw": "[file 14]"
+        },
+        {
+          "file_number": "20",
+          "file_name": "20_international_addendum.md",
+          "section": "5",
+          "raw": "[file 20, Section 5]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-11",
+      "file_name": "11_cod_and_failed_payments.md",
+      "title": "Cash on Delivery and Failed Payments",
+      "version": "2.0",
+      "effective_date": "2026-05-01",
+      "last_updated": "2026-04-20",
+      "scope": "general",
+      "checksum": "d702374cbff39402b2982dcd8f21f159803352c51df79c6d9458a7401b0a4c63",
+      "line_count": 40,
+      "section_count": 6,
+      "item_count": 9,
+      "cross_references": [
+        {
+          "file_number": "00",
+          "file_name": "00_how_policies_work_together.md",
+          "section": "5",
+          "raw": "[file 00, Section 5]"
+        },
+        {
+          "file_number": "03",
+          "file_name": "03_refunds_policy.md",
+          "section": "2",
+          "raw": "[file 03, Section 2]"
+        },
+        {
+          "file_number": "03",
+          "file_name": "03_refunds_policy.md",
+          "section": "3",
+          "raw": "[file 03, Section 3]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-12",
+      "file_name": "12_promo_code_rules.md",
+      "title": "Promo Code Rules",
+      "version": "2.0",
+      "effective_date": "2026-06-01",
+      "last_updated": "2026-05-22",
+      "scope": "general",
+      "checksum": "1bab84eae11c6a49f08f6c2ba84470e758d32a70b579af8fb2f119b96c98deb6",
+      "line_count": 77,
+      "section_count": 6,
+      "item_count": 23,
+      "cross_references": [
+        {
+          "file_number": "01",
+          "file_name": "01_returns_policy.md",
+          "section": "5",
+          "raw": "[file 01, Section 5]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-13",
+      "file_name": "13_sales_and_bundles.md",
+      "title": "Sales and Bundle Deals",
+      "version": "2.0",
+      "effective_date": "2026-06-01",
+      "last_updated": "2026-05-22",
+      "scope": "specific",
+      "checksum": "69eaeaee3b5106c63b5bf9f46c7eb233dd5cdeb658c2d39093f19906b5758e3c",
+      "line_count": 44,
+      "section_count": 4,
+      "item_count": 13,
+      "cross_references": [
+        {
+          "file_number": "00",
+          "file_name": "00_how_policies_work_together.md",
+          "section": "5",
+          "raw": "[file 00, Section 5]"
+        },
+        {
+          "file_number": "04",
+          "file_name": "04_non_returnable_items.md",
+          "section": "2",
+          "raw": "[file 04, Section 2]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-14",
+      "file_name": "14_store_credit.md",
+      "title": "Store Credit",
+      "version": "2.0",
+      "effective_date": "2026-03-01",
+      "last_updated": "2026-02-20",
+      "scope": "general",
+      "checksum": "17048bb8db574a3aefa2f0e029ab7d03906efd73708769d0cc02792ae4a9989c",
+      "line_count": 44,
+      "section_count": 6,
+      "item_count": 11,
+      "cross_references": [
+        {
+          "file_number": "05",
+          "file_name": "05_shipping_policy.md",
+          "section": "2.4",
+          "raw": "[file 05, Section 2.4]"
+        },
+        {
+          "file_number": "17",
+          "file_name": "17_seller_marketplace_rules.md",
+          "section": "6",
+          "raw": "[file 17, Section 6]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-15",
+      "file_name": "15_privacy_policy.md",
+      "title": "Privacy Policy",
+      "version": "2.0",
+      "effective_date": "2026-01-01",
+      "last_updated": "2025-12-15",
+      "scope": "general",
+      "checksum": "c18d0e8f554258a78820979e51d923ef209227062e8bd3c36f8d9903d339d25a",
+      "line_count": 46,
+      "section_count": 7,
+      "item_count": 11,
+      "cross_references": [
+        {
+          "file_number": "16",
+          "file_name": "16_data_requests_and_retention.md",
+          "section": "5",
+          "raw": "[file 16, Section 5]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-16",
+      "file_name": "16_data_requests_and_retention.md",
+      "title": "Data Requests and Retention",
+      "version": "2.0",
+      "effective_date": "2026-01-01",
+      "last_updated": "2025-12-15",
+      "scope": "general",
+      "checksum": "8d01598b5de59581029a3f7a4c5451e0170d94f6a26481ee70a74460f04f2a89",
+      "line_count": 43,
+      "section_count": 5,
+      "item_count": 8,
+      "cross_references": []
+    },
+    {
+      "doc_id": "NC-POL-17",
+      "file_name": "17_seller_marketplace_rules.md",
+      "title": "Seller Marketplace Rules",
+      "version": "2.0",
+      "effective_date": "2026-02-01",
+      "last_updated": "2026-01-22",
+      "scope": "specific",
+      "checksum": "b2b53331fb0f82f669b80ac1e3ed32c15f2c605f46ff8c31b92728c4afd63985",
+      "line_count": 52,
+      "section_count": 6,
+      "item_count": 10,
+      "cross_references": [
+        {
+          "file_number": "01",
+          "file_name": "01_returns_policy.md",
+          "section": null,
+          "raw": "[file 01]"
+        },
+        {
+          "file_number": "18",
+          "file_name": "18_seller_return_obligations.md",
+          "section": null,
+          "raw": "[file 18]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-18",
+      "file_name": "18_seller_return_obligations.md",
+      "title": "Seller Return Obligations",
+      "version": "2.0",
+      "effective_date": "2026-04-01",
+      "last_updated": "2026-03-20",
+      "scope": "specific",
+      "checksum": "149a1a545343093e214b3256abb654e1e2b795af5fb3d22e6f72989cdaf787f7",
+      "line_count": 36,
+      "section_count": 6,
+      "item_count": 7,
+      "cross_references": [
+        {
+          "file_number": "01",
+          "file_name": "01_returns_policy.md",
+          "section": null,
+          "raw": "[file 01]"
+        },
+        {
+          "file_number": "04",
+          "file_name": "04_non_returnable_items.md",
+          "section": null,
+          "raw": "[file 04]"
+        },
+        {
+          "file_number": "01",
+          "file_name": "01_returns_policy.md",
+          "section": "6",
+          "raw": "[file 01, Section 6]"
+        },
+        {
+          "file_number": "01",
+          "file_name": "01_returns_policy.md",
+          "section": "4",
+          "raw": "[file 01, Section 4]"
+        },
+        {
+          "file_number": "08",
+          "file_name": "08_warranty_policy.md",
+          "section": null,
+          "raw": "[file 08]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-19",
+      "file_name": "19_remote_areas_addendum.md",
+      "title": "Remote Areas Addendum",
+      "version": "2.0",
+      "effective_date": "2026-04-01",
+      "last_updated": "2026-03-20",
+      "scope": "regional",
+      "checksum": "e3583074d790e5a2e116c88ab7cb6f9b0b35c0c27e83f359341f493dd860e074",
+      "line_count": 38,
+      "section_count": 5,
+      "item_count": 9,
+      "cross_references": [
+        {
+          "file_number": "00",
+          "file_name": "00_how_policies_work_together.md",
+          "section": "2",
+          "raw": "[file 00, Section 2]"
+        },
+        {
+          "file_number": "07",
+          "file_name": "07_lost_or_damaged_deliveries.md",
+          "section": "2",
+          "raw": "[file 07, Section 2]"
+        },
+        {
+          "file_number": "01",
+          "file_name": "01_returns_policy.md",
+          "section": "2",
+          "raw": "[file 01, Section 2]"
+        },
+        {
+          "file_number": "01",
+          "file_name": "01_returns_policy.md",
+          "section": null,
+          "raw": "[file 01]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-20",
+      "file_name": "20_international_addendum.md",
+      "title": "International Orders Addendum",
+      "version": "2.0",
+      "effective_date": "2026-04-01",
+      "last_updated": "2026-03-20",
+      "scope": "regional",
+      "checksum": "2bdfbf31620710010db4cca4c3817f645c8385df5c6853b9e1500cc603741315",
+      "line_count": 58,
+      "section_count": 7,
+      "item_count": 14,
+      "cross_references": [
+        {
+          "file_number": "00",
+          "file_name": "00_how_policies_work_together.md",
+          "section": "2",
+          "raw": "[file 00, Section 2]"
+        },
+        {
+          "file_number": "07",
+          "file_name": "07_lost_or_damaged_deliveries.md",
+          "section": "2",
+          "raw": "[file 07, Section 2]"
+        },
+        {
+          "file_number": "01",
+          "file_name": "01_returns_policy.md",
+          "section": "3",
+          "raw": "[file 01, Section 3]"
+        },
+        {
+          "file_number": "03",
+          "file_name": "03_refunds_policy.md",
+          "section": "3",
+          "raw": "[file 03, Section 3]"
+        },
+        {
+          "file_number": "03",
+          "file_name": "03_refunds_policy.md",
+          "section": "2",
+          "raw": "[file 03, Section 2]"
+        },
+        {
+          "file_number": "08",
+          "file_name": "08_warranty_policy.md",
+          "section": null,
+          "raw": "[file 08]"
+        }
+      ]
+    },
+    {
+      "doc_id": "NC-POL-21",
+      "file_name": "21_shipping_fee_update_2027.md",
+      "title": "Shipping Fee Update 2027",
+      "version": "1.0",
+      "effective_date": "2027-02-01",
+      "last_updated": "2026-10-15",
+      "scope": "general",
+      "checksum": "f0f4d26e934e5587afe625e04deda8456782e9af76e33bd091b2914c0aacb673",
+      "line_count": 27,
+      "section_count": 2,
+      "item_count": 4,
+      "cross_references": [
+        {
+          "file_number": "19",
+          "file_name": "19_remote_areas_addendum.md",
+          "section": null,
+          "raw": "[file 19]"
+        },
+        {
+          "file_number": "20",
+          "file_name": "20_international_addendum.md",
+          "section": null,
+          "raw": "[file 20]"
+        },
+        {
+          "file_number": "05",
+          "file_name": "05_shipping_policy.md",
+          "section": null,
+          "raw": "[file 05]"
+        },
+        {
+          "file_number": "06",
+          "file_name": "06_shipping_fees_and_free_shipping.md",
+          "section": null,
+          "raw": "[file 06]"
+        }
+      ]
+    }
+  ]
+}
