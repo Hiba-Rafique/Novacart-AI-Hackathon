@@ -3,6 +3,7 @@ from .evidence import build_evidence
 from .extractive import ExtractiveReasoner
 from .gemini import GeminiReasoner
 from .models import (
+    CalculationArgument,
     CalculationProposal,
     Evidence,
     ModelClaim,
@@ -22,6 +23,7 @@ from .validate import (
 __all__ = [
     "SYSTEM_PROMPT",
     "AnswerPart",
+    "CalculationArgument",
     "CalculationProposal",
     "Citation",
     "Evidence",

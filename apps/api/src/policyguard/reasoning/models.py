@@ -19,9 +19,14 @@ class ModelClaim(BaseModel):
     conditions: list[str] = Field(default_factory=list)
 
 
+class CalculationArgument(BaseModel):
+    name: str
+    value: str
+
+
 class CalculationProposal(BaseModel):
     calculation_type: str
-    arguments: dict[str, str] = Field(default_factory=dict)
+    arguments: list[CalculationArgument] = Field(default_factory=list)
 
 
 class ModelOutput(BaseModel):

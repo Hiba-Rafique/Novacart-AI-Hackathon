@@ -1,4 +1,5 @@
 import asyncio
+import json
 from datetime import date
 
 import pytest
@@ -18,6 +19,12 @@ from policyguard.reasoning import (
 )
 from policyguard.retrieval import BM25Retriever
 from policyguard.schemas import AskRequest, ConversationFacts, ConversationState
+
+
+def test_model_output_schema_is_gemini_compatible() -> None:
+    schema = json.dumps(ModelOutput.model_json_schema())
+
+    assert "additionalProperties" not in schema
 
 
 def _evidence() -> list[Evidence]:

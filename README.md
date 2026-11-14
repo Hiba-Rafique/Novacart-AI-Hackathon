@@ -165,8 +165,15 @@ Rebuild the index whenever a policy file changes, then commit `apps/api/data/ind
 
 ```bash
 docker build -t novacart-policyguard:local .
-docker run --rm -p 7860:7860 --env-file apps/api/.env novacart-policyguard:local
+docker run --rm -p 7860:7860 \
+  --env-file apps/api/.env \
+  -e POLICIES_DIR=/app/policies \
+  -e DATA_DIR=/app/data \
+  -e INDEX_DIR=/app/data/index \
+  novacart-policyguard:local
 ```
+
+The container path overrides are required because the local `.env` uses host-relative paths.
 
 `render.yaml` creates a Free Docker Web Service from this GitHub repository. Render injects
 `PORT=10000`; the container binds `0.0.0.0:$PORT`, and `render.yaml` deliberately does not set

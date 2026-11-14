@@ -6,9 +6,20 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
+def _find_repo_root(module_path: Path) -> Path:
+    app_root = module_path.parents[2]
+    if (app_root / "policies").is_dir():
+        return app_root
+    for parent in module_path.parents:
+        if (parent / "policies").is_dir():
+            return parent
+    return app_root
+
+
 _MODULE_PATH = Path(__file__).resolve()
 APP_ROOT = _MODULE_PATH.parents[2]
-REPO_ROOT = _MODULE_PATH.parents[4]
+REPO_ROOT = _find_repo_root(_MODULE_PATH)
 
 
 class Settings(BaseSettings):
