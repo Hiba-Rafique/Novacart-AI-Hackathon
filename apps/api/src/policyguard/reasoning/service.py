@@ -18,6 +18,7 @@ from policyguard.schemas import (
 from .base import Reasoner
 from .evidence import build_evidence
 from .extractive import ExtractiveReasoner
+from .facts import extract_contact_date
 from .gemini import GeminiReasoner
 from .validate import validate_model_output
 
@@ -39,6 +40,29 @@ class PolicyService:
     async def ask(self, request: AskRequest, *, request_id: str) -> AskResponse:
         conversation = request.conversation or ConversationState()
         facts = conversation.facts
+        try:
+            message_contact_date = extract_contact_date(
+                request.question,
+                awaiting_contact_date=conversation.last_asked_field == "contact_date",
+            )
+        except ValueError as exc:
+            question = str(exc)
+            return AskResponse(
+                status="CLARIFY",
+                answer=question,
+                clarifying_question=question,
+                conversation=ConversationState(
+                    original_question=conversation.original_question or request.question,
+                    facts=facts,
+                    last_asked_field="contact_date",
+                ),
+                resolved_contact_date=resolve_contact_date(
+                    facts.contact_date, self._clock
+                ).contact_date,
+                request_id=request_id,
+            )
+        if message_contact_date is not None:
+            facts = facts.model_copy(update={"contact_date": message_contact_date})
         resolution = resolve_contact_date(facts.contact_date, self._clock)
 
         results = self._retriever.search(

@@ -157,3 +157,50 @@ def test_explicit_contact_date_unlocks_2027_shipping_rules() -> None:
     assert response.resolved_contact_date == date(2027, 2, 1)
     filenames = {citation.filename for citation in response.citations}
     assert "21_shipping_fee_update_2027.md" in filenames
+
+
+def test_message_contact_date_unlocks_2027_thresholds_and_is_saved() -> None:
+    request = AskRequest(
+        question=(
+            "My contact date is 2027-03-01. My Metro order subtotal after discount "
+            "is Rs. 5,999. What is the standard shipping fee? "
+            "What if it is exactly Rs. 6,000?"
+        ),
+    )
+
+    response = asyncio.run(_service().ask(request, request_id="message-date"))
+
+    assert response.resolved_contact_date == date(2027, 3, 1)
+    assert response.conversation.facts.contact_date == date(2027, 3, 1)
+    assert any(
+        citation.filename == "21_shipping_fee_update_2027.md" for citation in response.citations
+    )
+
+
+def test_new_message_contact_date_overrides_saved_date_without_mutating_request() -> None:
+    request = AskRequest(
+        question="My contact date is 2027-03-01. What is the Metro shipping fee?",
+        conversation=ConversationState(
+            facts=ConversationFacts(contact_date=date(2026, 11, 14)),
+        ),
+    )
+
+    response = asyncio.run(_service().ask(request, request_id="changed-date"))
+
+    assert response.resolved_contact_date == date(2027, 3, 1)
+    assert request.conversation.facts.contact_date == date(2026, 11, 14)
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "My contact date is 2027-02-30. What is shipping?",
+        "Contact date: 2026-11-14. Contact date: 2027-03-01. What is shipping?",
+    ],
+)
+def test_invalid_or_conflicting_contact_dates_require_clarification(question: str) -> None:
+    response = asyncio.run(_service().ask(AskRequest(question=question), request_id="invalid-date"))
+
+    assert response.status == "CLARIFY"
+    assert response.conversation.last_asked_field == "contact_date"
+    assert response.citations == []

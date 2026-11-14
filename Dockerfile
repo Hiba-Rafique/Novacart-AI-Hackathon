@@ -16,6 +16,7 @@ COPY apps/api/src ./src
 COPY policies ./policies
 COPY apps/api/data ./data
 RUN uv sync --frozen --no-dev
+RUN .venv/bin/python -c "from pathlib import Path; from policyguard.ingest import validate_index; validate_index(Path('/app/policies'), Path('/app/data/index'))"
 
 FROM python:3.12-slim AS runtime
 

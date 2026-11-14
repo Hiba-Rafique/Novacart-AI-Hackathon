@@ -196,6 +196,8 @@ The container path overrides are required because the local `.env` uses host-rel
 `PORT`. Add `GEMINI_API_KEY` in Render's environment settings as a secret (`sync: false`).
 The index and `policies/` are baked into the image because Free instances have ephemeral disks.
 The `/readyz` health check validates the committed index hashes without calling Gemini.
+Index hashes normalize CRLF/LF line endings so Windows and Linux checkouts agree.
+The Docker build also validates the index, catching stale artifacts before deployment.
 
 #### First Render deployment
 

@@ -42,6 +42,7 @@ def test_health_and_ui_routes() -> None:
         assert client.get("/healthz").json() == {"status": "ok"}
         assert client.get("/readyz").status_code == 200
         assert "NovaCart PolicyGuard" in client.get("/").text
+        assert client.head("/").status_code == 200
         info = client.get("/api/v1/info").json()
         assert info["model_mode"] == "offline-extractive"
 

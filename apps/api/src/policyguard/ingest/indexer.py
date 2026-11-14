@@ -14,11 +14,12 @@ MANIFEST_FILE = "manifest.json"
 
 
 def corpus_hash(policies_dir: Path) -> str:
+    """Hash policy content independently of Git's CRLF/LF checkout conversion."""
     digest = hashlib.sha256()
     for path in sorted(policies_dir.glob("*.md")):
         digest.update(path.name.encode("utf-8"))
         digest.update(b"\0")
-        digest.update(path.read_bytes())
+        digest.update(path.read_bytes().replace(b"\r\n", b"\n"))
         digest.update(b"\0")
     return digest.hexdigest()
 

@@ -81,7 +81,7 @@ def create_app(
                 app.state.manifest = manifest
                 app.state.ready = True
             except (IndexValidationError, OSError, ValueError) as exc:
-                LOGGER.error("policy index is not ready: %s", type(exc).__name__)
+                LOGGER.error("policy index is not ready (%s): %s", type(exc).__name__, exc)
                 app.state.ready_error = type(exc).__name__
         else:
             app.state.ready = True
@@ -159,7 +159,7 @@ def create_app(
             request_id=_request_id(request),
         )
 
-    @app.get("/", include_in_schema=False)
+    @app.api_route("/", methods=["GET", "HEAD"], include_in_schema=False)
     async def root():
         return FileResponse(STATIC_DIR / "index.html")
 

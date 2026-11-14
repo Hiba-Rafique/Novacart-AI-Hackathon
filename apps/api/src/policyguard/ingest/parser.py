@@ -234,7 +234,7 @@ def parse_document(path: Path, file_names: dict[str, str]) -> ParsedDocument:
                 seen_refs.add(reference.raw)
                 all_cross_references.append(reference)
 
-    checksum = hashlib.sha256(path.read_bytes()).hexdigest()
+    checksum = hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
     document = PolicyDocument(
         doc_id=metadata["doc_id"],
         file_name=path.name,

@@ -62,3 +62,25 @@ def test_validation_rejects_changed_corpus(tmp_path: Path) -> None:
 
     with pytest.raises(IndexValidationError, match="changed"):
         validate_index(policies, index)
+
+
+@pytest.mark.parametrize("initial_newline", [b"\n", b"\r\n"])
+def test_index_validates_after_checkout_line_endings_change(
+    tmp_path: Path, initial_newline: bytes
+) -> None:
+    policies = tmp_path / "policies"
+    copytree(REPO_ROOT / "policies", policies)
+    for path in policies.glob("*.md"):
+        path.write_bytes(path.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", initial_newline))
+    index = tmp_path / "index"
+    original = build_index(policies, index)
+
+    other_newline = b"\r\n" if initial_newline == b"\n" else b"\n"
+    for path in policies.glob("*.md"):
+        path.write_bytes(path.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", other_newline))
+
+    assert validate_index(policies, index).corpus_hash == original.corpus_hash
+    rebuilt = build_index(policies, tmp_path / "rebuilt")
+    assert [doc.checksum for doc in rebuilt.documents] == [
+        doc.checksum for doc in original.documents
+    ]
