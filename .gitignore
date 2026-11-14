@@ -1,0 +1,15 @@
+.venv/
+**/.venv/
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+**/.pytest_cache/
+.ruff_cache/
+**/.ruff_cache/
+.moon/cache/
+.env
+.env.*
+!**/.env.example
+*.pyc
+*.pyo
+.DS_Store

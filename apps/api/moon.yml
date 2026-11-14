@@ -1,0 +1,46 @@
+language: python
+layer: application
+
+# All commands run relative to apps/api, where pyproject.toml lives.
+tasks:
+  dev:
+    command: uv run uvicorn policyguard.main:app --reload --host 0.0.0.0 --port 7860
+    toolchains: system
+    options:
+      cache: false
+
+  test:
+    command: uv run pytest -q
+    toolchains: system
+    options:
+      cache: false
+
+  test-verbose:
+    command: uv run pytest -vv
+    toolchains: system
+    options:
+      cache: false
+
+  lint:
+    command: uv run ruff check .
+    toolchains: system
+    options:
+      cache: false
+
+  format-check:
+    command: uv run ruff format --check .
+    toolchains: system
+    options:
+      cache: false
+
+  format:
+    command: uv run ruff format .
+    toolchains: system
+    options:
+      cache: false
+
+  index:
+    command: uv run python -m policyguard.ingest.cli
+    toolchains: system
+    options:
+      cache: false
