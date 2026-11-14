@@ -1,19 +1,270 @@
-# NovaCart Policy Knowledge Base
+# NovaCart PolicyGuard
 
 **Tech Fusion '26 · AI Hackathon · Challenge A: Policy Q&A Bot**
 Bahria University Islamabad · 14 November 2026 · Organised by the AI Club
 
-This repository holds the complete knowledge base for Challenge A. It contains the policy files of **NovaCart**, a fictional online store, and nothing else. The problem statement, the submission and the leaderboard are handled on the **ETL** platform.
+An AI-powered policy Q&A assistant for **NovaCart**, a fictional online store. PolicyGuard
+retrieves evidence from the 22 organizer-provided policy files and uses Gemini to answer
+questions with verifiable, section-level citations. The policy files are the only knowledge base.
+
+**[Live demo](https://novacart-policyguard.onrender.com)** ·
+**[API documentation](https://novacart-policyguard.onrender.com/docs)** ·
+**[Readiness](https://novacart-policyguard.onrender.com/readyz)**
+
+> **Gemini rate-limit disclaimer:** The Gemini API quota used for this submission is
+> **15 requests per minute (15 RPM)**, shared across users of the demo. Sending many
+> questions in quick succession may exhaust the quota and temporarily prevent answers.
+> Please test sequentially; if rate-limited, wait approximately 60 seconds before retrying.
+> Model availability and other provider quotas can also affect requests. This is the
+> submission project's quota, not a universal limit for every Gemini model or account.
+
+> **Render Free hosting:** The service can sleep after 15 minutes of inactivity. Its
+> first request after an idle period may take about a minute while the service wakes up.
+
+## What the assistant does
+
+- Retrieves relevant policy items with **BM25 search** and query expansion.
+- Returns **filename, section, and exact supporting quotes** for grounded answers.
+- Uses explicit contact dates to select applicable policy versions, including the 2027
+  shipping update, and supplies documented precedence resolutions to the model.
+- Recognizes labelled contact dates in chat, such as `My contact date is 2027-03-01`.
+  Missing, invalid, or conflicting contact dates trigger a clarification question;
+  the system clock is never used to select a policy version.
+- Supports answer, clarification, partial-answer, and not-covered responses.
+- Quarantines four identified instruction-like lines during indexing, treats retrieved
+  text as untrusted data, and rejects citations or quotes absent from the supplied evidence.
+- Provides a chat UI, a structured JSON API, and an extractive mode when no Gemini key is set.
+
+## Architecture
+
+```text
+Immutable policy Markdown
+  -> parse metadata, numbered items, tables and cross-references
+  -> sanitize instruction-like content
+  -> 270 chunks + corpus manifest
+
+Chat UI / POST /api/v1/ask
+  -> resolve explicit contact date and conversation facts
+  -> BM25 retrieval with effective-date filtering
+  -> evidence selection + policy-precedence context
+  -> Gemini structured output (or offline extractive mode)
+  -> validate evidence IDs and exact quotes
+  -> answer + structured citations + conversation state
+```
+
+**Stack:** Python 3.12, FastAPI, Pydantic, Google GenAI SDK, rank-bm25, plain
+HTML/CSS/JavaScript, uv, pytest, Ruff, Docker, and Render.
+
+## Run locally
+
+Prerequisites: **Python 3.12** and **[uv](https://docs.astral.sh/uv/getting-started/installation/)**.
+Docker Desktop is required only for the container option.
+
+### Windows PowerShell
+
+```powershell
+git clone https://github.com/Hiba-Rafique/Novacart-AI-Hackathon.git
+Set-Location Novacart-AI-Hackathon/apps/api
+uv sync --frozen
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+```
+
+Edit `apps/api/.env` and replace the `GEMINI_API_KEY` placeholder with your own key.
+Keep an existing `.env` if it is already configured. Then start the application:
+
+```powershell
+uv run uvicorn policyguard.main:app --reload --host 127.0.0.1 --port 7860
+```
+
+### macOS / Linux
+
+```bash
+git clone https://github.com/Hiba-Rafique/Novacart-AI-Hackathon.git
+cd Novacart-AI-Hackathon/apps/api
+uv sync --frozen
+test -f .env || cp .env.example .env
+# Edit .env and set GEMINI_API_KEY before starting.
+uv run uvicorn policyguard.main:app --reload --host 127.0.0.1 --port 7860
+```
+
+Open **http://127.0.0.1:7860**; local API documentation is at
+**http://127.0.0.1:7860/docs**. Keep the terminal running and use `Ctrl+C` to stop.
+The committed index is ready to use without rebuilding it. To run without Gemini,
+leave `GEMINI_API_KEY` empty or unset; extractive mode has more limited answer synthesis.
+Never commit a real API key; `.env` is ignored by Git and excluded from Docker builds.
+
+### Configuration
+
+| Variable | Default / purpose |
+| --- | --- |
+| `GEMINI_API_KEY` | Your API key; empty or unset selects extractive mode |
+| `GEMINI_MODEL` | `gemini-3.5-flash-lite` |
+| `MODEL_TIMEOUT_SECONDS` | `20` seconds per model request |
+| `RAG_TOP_K` | `15` retrieval candidates; at most 12 evidence chunks reach the reasoner |
+| `APP_TIMEZONE` | `Asia/Karachi` |
+| `POLICIES_DIR` | Local `.env`: `../../policies`; Docker: `/app/policies` |
+| `INDEX_DIR` | Local `.env`: `./data/index`; Docker: `/app/data/index` |
+
+See [`apps/api/.env.example`](apps/api/.env.example) for the complete template.
+Embedding settings are reserved configuration; the current retriever is BM25-only.
+
+## API usage
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET`, `HEAD` | `/` | Chat interface / availability probe |
+| `GET` | `/healthz` | Process liveness; no Gemini call |
+| `GET` | `/readyz` | Index readiness; expects 22 documents and 270 chunks |
+| `GET` | `/api/v1/info` | Version, timezone, model mode, and corpus counts |
+| `POST` | `/api/v1/ask` | Ask a policy question |
+| `GET` | `/docs` | Interactive OpenAPI documentation |
+
+Example request:
+
+```json
+{
+  "question": "My contact date is 2027-03-01. My Metro subtotal after discount is Rs. 5,999. What is the standard shipping fee?",
+  "conversation": {
+    "facts": {
+      "contact_date": "2027-03-01",
+      "region": "metro"
+    }
+  }
+}
+```
+
+The applicable fee in this example is **Rs. 300**, supported by
+`21_shipping_fee_update_2027.md`, Section `1.1`.
+Responses include `status`, `answer`, `parts`, `citations`, `conversation`,
+`resolved_contact_date`, and `request_id`. Status is one of `ANSWER`, `CLARIFY`,
+`PARTIAL`, or `NOT_COVERED`. Send the returned `conversation` object with a follow-up
+to retain structured facts. Source citations include the filename, section, and supporting quote.
+
+### Explicit dates only
+
+**The assistant never uses the system date to answer policy questions.** Supply the
+contact date explicitly in the message (`My contact date is 2027-03-01`) or in
+`conversation.facts.contact_date`. Without it, the API returns `CLARIFY` before retrieval
+or a model call, with `resolved_contact_date: null`. The original question is retained;
+replying with an ISO date completes the contact-date clarification.
+
+Order, delivery, claim, and policy effective dates are not substitutes for a contact
+date. Missing dates required for an eligibility decision must be requested rather
+than inferred. Relative dates such as `today` or `yesterday` are not resolved using
+the server clock. The `/api/v1/info` endpoint reports
+`date_policy: explicit_user_dates_only` and does not expose a server date.
+Index generation timestamps are operational metadata only; they are not policy inputs.
+
+Invalid requests return HTTP `422`; oversized requests can return `413`.
+Index readiness failures, Gemini unavailability (including quota errors), or rejected
+model output return HTTP `503` with a structured error and request ID. Provider quota
+errors are currently surfaced as `MODEL_UNAVAILABLE`, not as a dedicated HTTP `429` response.
+
+## Tests and index verification
+
+From `apps/api`:
+
+```bash
+uv run pytest -q
+uv run ruff check .
+uv run ruff format --check .
+```
+
+The test suite covers ingestion and injection quarantine,
+retrieval, citation validation, finance/date helpers, precedence, contact-date extraction,
+API behavior, missing-date clarification, and CRLF/LF index consistency. Automated tests
+use explicit dates and offline/fake reasoners; they do not consume Gemini quota. Live Gemini and Docker smoke
+tests were also performed separately.
+
+To regenerate derived index artifacts without editing the policy files:
+
+```bash
+uv run python -m policyguard.ingest.cli
+```
+
+The index manifest records corpus metadata and hashes. Hashing normalizes CRLF/LF
+line endings so Windows and Linux checkouts agree, while content changes still fail
+validation. Docker validates the committed index during the build and the app validates
+it at startup.
+
+## Docker and deployment
+
+Run from the repository root after configuring `apps/api/.env`:
+
+```bash
+docker build -t novacart-policyguard:local .
+docker run --rm -p 7860:7860 --env-file apps/api/.env -e POLICIES_DIR=/app/policies -e DATA_DIR=/app/data -e INDEX_DIR=/app/data/index novacart-policyguard:local
+```
+
+The path overrides replace the host-relative paths in the local `.env`. The container
+runs as a non-root user and binds to `0.0.0.0` on the injected `PORT` (local default `7860`).
+It was smoke-tested on `PORT=10000` with a 512 MB memory limit.
+
+### Render
+
+[`render.yaml`](render.yaml) defines a **Free Docker Web Service** in **Singapore**,
+tracking `main`, with automatic deploys on commit and `/readyz` as its health check.
+
+1. Push the application and derived index artifacts to GitHub.
+2. In [Render](https://dashboard.render.com), select **New > Blueprint** and connect
+   `Hiba-Rafique/Novacart-AI-Hackathon`, branch `main`, using the root `render.yaml`.
+3. Keep the Docker build context at the repository root, not `apps/api`.
+4. Enter `GEMINI_API_KEY` when prompted. Render needs its own secret value; your local
+   `.env` is not uploaded. Other settings come from the Blueprint.
+5. Apply the Blueprint and wait for **Live**. Render manages `PORT` automatically;
+   the Dockerfile provides the start command.
+
+The policy corpus and index are baked into the image; no persistent disk or database is
+required. Readiness checks do not call Gemini or consume its quota.
+
+```powershell
+$baseUrl = "https://novacart-policyguard.onrender.com"
+Invoke-RestMethod "$baseUrl/readyz"
+Invoke-RestMethod "$baseUrl/api/v1/info"
+```
+
+Readiness should show 22 documents and 270 chunks; the demo's info endpoint should show
+`model_mode: gemini`. For failed readiness, inspect the startup validation message in
+Render logs. For `MODEL_UNAVAILABLE`, check the API key, model access, quota, and timeout.
+
+## Known limitations
+
+- **15 RPM Gemini quota:** demo requests share the configured provider quota; there is
+  no application-level request queue or automatic quota-retry mechanism.
+- **Retrieval and generation:** BM25 can miss relevant evidence, and exact-quote validation
+  verifies citation integrity rather than proving every generated claim is correct.
+- **Facts and dates:** supply dates explicitly as `YYYY-MM-DD`. Labelled contact dates
+  are extracted from messages; other facts, especially region, should be supplied in
+  `conversation.facts` for reliable regional evidence selection. Full free-text fact
+  extraction and automatic merging of other follow-up facts are not implemented.
+  A missing contact date always requires clarification; no customer date is filled
+  from the system clock.
+- **Calculations:** deterministic finance/date helpers are implemented and tested, but
+  finance calculations are not wired into the chat pipeline. The API's `calculation`
+  field is currently `null`; generated financial answers are not guaranteed calculator results.
+- **Scope:** this is a policy assistant, not an order-management system. It cannot look
+  up purchases, approve refunds, process payments, or perform account actions.
+- **Offline mode:** it returns extractive policy content and is less conversational than Gemini.
 
 ---
 ## Repository layout
 ```
-novacart-policy-bot/
-├── README.md        this file
-├── .gitignore       keeps secrets such as .env out of your repository
-└── policies/        the knowledge base: 22 policy files (00 to 21)
+Novacart-AI-Hackathon/
+├── policies/                 immutable organizer knowledge base: files 00–21
+├── apps/api/
+│   ├── src/policyguard/       API, retrieval, reasoning, ingestion and finance helpers
+│   ├── data/index/           generated chunks and manifest
+│   ├── tests/                unit and integration tests
+│   ├── .env.example          configuration template (no real key)
+│   ├── pyproject.toml        dependencies and checks
+│   └── uv.lock               locked dependencies
+├── .moon/                    Moon workspace configuration
+├── Dockerfile                container build and startup
+├── render.yaml               Render Blueprint
+└── README.md                 submission documentation
 ```
-Your bot's code, your own tests and your own documents are added by your team in your own repository. The `policies/` folder is the only knowledge your bot may use.
+The following corpus reference and participant rules describe the organizer-provided
+knowledge base. Submission and leaderboard handling are on the **ETL** platform.
 
 ---
 
@@ -122,116 +373,8 @@ These are explained in full in file 00.
 1. The files in `policies/` are the only knowledge base. Do not add outside knowledge about real stores, laws or products.
 2. Do not edit, rename or delete the policy files. Evaluation uses the original files, so changes in your copy will not be honoured.
 3. You are free to read, split, index, embed or otherwise process the files in any way you like.
-4. There are no sample questions or answers in this repository. Design your own tests.
+4. The organizer-provided corpus contains no sample questions or answers. Tests and usage examples in this submission are team-authored.
 5. Submission, the problem statement and the leaderboard are on ETL.
-
----
-
-## Getting started
-
-Teams clone this repository at kickoff and push it to a fresh repository created at kickoff.
-
-```bash
-git clone <organizer-repo-url> novacart-policy-bot
-cd novacart-policy-bot
-git remote set-url origin <your-new-repo-url>
-git push -u origin main
-```
-
-Keep API keys in a `.env` file. It is already listed in `.gitignore`, so it will not be committed.
-
----
-
-## PolicyGuard application
-
-The implementation lives in `apps/api`. It is a FastAPI service with BM25 retrieval,
-policy-exact finance/date helpers, citation validation, and a Gemini reasoning stage.
-Without `GEMINI_API_KEY`, it runs in a deterministic extractive mode so the demo still works.
-
-### Local commands
-
-```bash
-cd apps/api
-cp .env.example .env
-uv sync
-uv run python -m policyguard.ingest.cli
-uv run uvicorn policyguard.main:app --reload --host 0.0.0.0 --port 7860
-```
-
-Open `http://127.0.0.1:7860`. The health endpoints are `/healthz` and `/readyz`.
-Rebuild the index whenever a policy file changes, then commit `apps/api/data/index`.
-
-#### Windows PowerShell
-
-From a PowerShell terminal, use the following commands for this checkout:
-
-```powershell
-Set-Location "D:\projec\hackathon\Novacart-AI-Hackathon\apps\api"
-uv sync --frozen
-uv run uvicorn policyguard.main:app --reload --host 127.0.0.1 --port 7860
-```
-
-The existing `apps/api/.env` already contains the local Gemini configuration; keep it.
-For a fresh checkout only, copy `.env.example` to `.env` and fill in `GEMINI_API_KEY`
-before starting the server. The committed index is ready to use without rebuilding it.
-Open <http://127.0.0.1:7860>; API documentation is at <http://127.0.0.1:7860/docs>.
-Keep the terminal open while using the app, and press `Ctrl+C` to stop it.
-
-### Docker and Render
-
-```bash
-docker build -t novacart-policyguard:local .
-docker run --rm -p 7860:7860 \
-  --env-file apps/api/.env \
-  -e POLICIES_DIR=/app/policies \
-  -e DATA_DIR=/app/data \
-  -e INDEX_DIR=/app/data/index \
-  novacart-policyguard:local
-```
-
-The container path overrides are required because the local `.env` uses host-relative paths.
-
-`render.yaml` creates a Free Docker Web Service from this GitHub repository. Render injects
-`PORT=10000`; the container binds `0.0.0.0:$PORT`, and `render.yaml` deliberately does not set
-`PORT`. Add `GEMINI_API_KEY` in Render's environment settings as a secret (`sync: false`).
-The index and `policies/` are baked into the image because Free instances have ephemeral disks.
-The `/readyz` health check validates the committed index hashes without calling Gemini.
-Index hashes normalize CRLF/LF line endings so Windows and Linux checkouts agree.
-The Docker build also validates the index, catching stale artifacts before deployment.
-
-#### First Render deployment
-
-1. Push the committed application to this repository's `main` branch:
-   `git push origin main`.
-2. Sign in at <https://dashboard.render.com>, choose **New > Blueprint**, and connect
-   `Hiba-Rafique/Novacart-AI-Hackathon`. Authorize Render to access the repository if prompted.
-3. Select `main` and the root `render.yaml`. Keep the repository root as the Docker
-   build context; do not set the service root directory to `apps/api`.
-4. Review the proposed service: Docker runtime, Free plan, Singapore region, and
-   `/readyz` health check. The Dockerfile supplies the start command.
-5. Enter the value of `GEMINI_API_KEY` from your local `.env` when prompted. Render
-   does not receive your local `.env`, so the key must be entered separately.
-   Other settings come from `render.yaml`; leave `PORT` managed by Render.
-6. Apply the Blueprint and wait for the service deployment to become **Live**.
-   Open the actual `https://...onrender.com` URL shown by Render.
-
-Check the public service in PowerShell, replacing the placeholder with its actual URL:
-
-```powershell
-$baseUrl = "https://YOUR-SERVICE.onrender.com"
-Invoke-RestMethod "$baseUrl/readyz"
-Invoke-RestMethod "$baseUrl/api/v1/info"
-$body = @{ question = "What is the standard shipping fee for Metro cities?" } | ConvertTo-Json
-Invoke-RestMethod "$baseUrl/api/v1/ask" -Method Post -ContentType "application/json" -Body $body
-```
-
-Readiness should report 22 documents and 270 chunks, info should report
-`model_mode: gemini`, and the answer should include policy citations.
-The Free service can sleep after 15 minutes of inactivity, so the first request
-after an idle period can take about a minute. Later pushes to `main` automatically
-trigger deployment. A `503 MODEL_UNAVAILABLE` response calls for checking the
-Render Gemini key, model access, and quota; a failed `/readyz` calls for checking
-the deployment logs and the index/policy paths.
 
 ---
 

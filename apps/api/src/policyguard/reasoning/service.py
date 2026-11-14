@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from policyguard.config import Settings
-from policyguard.finance import Clock, SystemClock, resolve_contact_date
+from policyguard.finance import resolve_contact_date
 from policyguard.policy import precedence_context
 from policyguard.retrieval import Retriever
 from policyguard.schemas import (
@@ -30,12 +30,10 @@ class PolicyService:
         settings: Settings,
         retriever: Retriever,
         reasoner: Reasoner,
-        clock: Clock,
     ) -> None:
         self._settings = settings
         self._retriever = retriever
         self._reasoner = reasoner
-        self._clock = clock
 
     async def ask(self, request: AskRequest, *, request_id: str) -> AskResponse:
         conversation = request.conversation or ConversationState()
@@ -45,6 +43,9 @@ class PolicyService:
                 request.question,
                 awaiting_contact_date=conversation.last_asked_field == "contact_date",
             )
+            if message_contact_date is not None:
+                facts = facts.model_copy(update={"contact_date": message_contact_date})
+            resolution = resolve_contact_date(facts.contact_date)
         except ValueError as exc:
             question = str(exc)
             return AskResponse(
@@ -53,20 +54,19 @@ class PolicyService:
                 clarifying_question=question,
                 conversation=ConversationState(
                     original_question=conversation.original_question or request.question,
-                    facts=facts,
+                    facts=facts.model_copy(update={"contact_date": None}),
                     last_asked_field="contact_date",
                 ),
-                resolved_contact_date=resolve_contact_date(
-                    facts.contact_date, self._clock
-                ).contact_date,
+                resolved_contact_date=None,
                 request_id=request_id,
             )
-        if message_contact_date is not None:
-            facts = facts.model_copy(update={"contact_date": message_contact_date})
-        resolution = resolve_contact_date(facts.contact_date, self._clock)
+
+        question = request.question
+        if conversation.original_question:
+            question = f"{conversation.original_question}\nCustomer follow-up: {request.question}"
 
         results = self._retriever.search(
-            request.question,
+            question,
             self._settings.rag_top_k,
             max_effective_date=resolution.contact_date,
         )
@@ -76,7 +76,7 @@ class PolicyService:
         prompt_facts["resolved_contact_date_source"] = resolution.source
         prompt_facts["policy_precedence"] = precedence_context(resolution.contact_date)
 
-        output = await self._reasoner.analyze(request.question, prompt_facts, evidence)
+        output = await self._reasoner.analyze(question, prompt_facts, evidence)
         validated = validate_model_output(output, evidence)
 
         if validated.status == "CLARIFY":
@@ -130,7 +130,6 @@ def create_service(settings: Settings, retriever: Retriever) -> PolicyService:
         settings=settings,
         retriever=retriever,
         reasoner=create_reasoner(settings),
-        clock=SystemClock(settings.timezone),
     )
 
 

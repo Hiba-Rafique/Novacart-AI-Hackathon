@@ -2,44 +2,22 @@ from __future__ import annotations
 
 import calendar
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
-from typing import Literal, Protocol
-from zoneinfo import ZoneInfo
+from datetime import date, timedelta
+from typing import Literal
 
-
-class Clock(Protocol):
-    def today(self) -> date: ...
-
-
-class SystemClock:
-    def __init__(self, timezone: ZoneInfo) -> None:
-        self._timezone = timezone
-
-    def today(self) -> date:
-        return datetime.now(self._timezone).date()
-
-
-class FixedClock:
-    def __init__(self, today: date) -> None:
-        self._today = today
-
-    def today(self) -> date:
-        return self._today
+from .domain import MissingFactError
 
 
 @dataclass(frozen=True)
 class DateResolution:
     contact_date: date
-    source: Literal["explicit", "system"]
+    source: Literal["explicit"]
 
 
-def resolve_contact_date(
-    explicit: date | None,
-    clock: Clock,
-) -> DateResolution:
-    if explicit is not None:
-        return DateResolution(contact_date=explicit, source="explicit")
-    return DateResolution(contact_date=clock.today(), source="system")
+def resolve_contact_date(explicit: date | None) -> DateResolution:
+    if explicit is None:
+        raise MissingFactError("What is your contact date in YYYY-MM-DD format?")
+    return DateResolution(contact_date=explicit, source="explicit")
 
 
 def add_days(start: date, days: int) -> date:

@@ -99,7 +99,7 @@ class AskResponse(BaseModel):
     calculation: CalculationResponse | None = None
     clarifying_question: str | None = None
     conversation: ConversationState
-    resolved_contact_date: date
+    resolved_contact_date: date | None = None
     request_id: str
 
 

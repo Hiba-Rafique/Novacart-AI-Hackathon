@@ -3,7 +3,6 @@ from datetime import date
 import pytest
 
 from policyguard.finance import (
-    FixedClock,
     MissingFactError,
     MoneyError,
     PolicyInputError,
@@ -57,14 +56,13 @@ def test_date_rules() -> None:
     assert add_days(date(2026, 1, 1), 5) == date(2026, 1, 6)
 
 
-def test_explicit_contact_date_beats_clock() -> None:
-    explicit = resolve_contact_date(date(2026, 5, 1), FixedClock(date(2026, 9, 1)))
-    fallback = resolve_contact_date(None, FixedClock(date(2026, 9, 1)))
+def test_contact_date_requires_an_explicit_customer_date() -> None:
+    explicit = resolve_contact_date(date(2026, 5, 1))
 
     assert explicit.contact_date == date(2026, 5, 1)
     assert explicit.source == "explicit"
-    assert fallback.contact_date == date(2026, 9, 1)
-    assert fallback.source == "system"
+    with pytest.raises(MissingFactError, match="contact date"):
+        resolve_contact_date(None)
 
 
 def test_style15_worked_example() -> None:

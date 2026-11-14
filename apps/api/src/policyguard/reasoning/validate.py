@@ -86,7 +86,7 @@ def validate_model_output(
         parts.append(AnswerPart(text=claim.claim.strip(), citations=part_citations))
 
     if output.disposition == "ANSWER":
-        answer = "Based on the supplied policies, " + " ".join(part.text for part in parts)
+        answer = " ".join(part.text for part in parts)
     elif output.disposition == "PARTIAL":
         covered = " ".join(part.text for part in parts) or "Some requested points are covered."
         uncovered = " ".join(output.uncovered_parts) or "A complete determination is not supported."
@@ -98,10 +98,6 @@ def validate_model_output(
 
     if output.conflicts:
         answer = f"{answer}\nPolicy conflict: {' '.join(output.conflicts)}"
-    if citations:
-        sources = "; ".join(citation.id for citation in citations.values())
-        answer = f"{answer}\nSources: {sources}."
-
     return ValidatedAnswer(
         status=output.disposition,
         answer=answer.strip(),

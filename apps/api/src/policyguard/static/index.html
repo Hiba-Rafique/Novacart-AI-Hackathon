@@ -119,14 +119,14 @@
       <span class="tag">Policy-only assistant</span>
     </header>
     <p class="notice">
-      Answers use only the supplied NovaCart policy files. Dates must come from your question;
-      the server clock is never used to infer an order or delivery date.
+      Answers use only the supplied NovaCart policy files. Include your contact date as
+      YYYY-MM-DD. Dates must come from you; the server clock is never used to infer them.
     </p>
     <section id="chat" aria-live="polite" aria-label="Conversation"></section>
     <form id="ask-form">
       <label for="question" hidden>Your question</label>
       <textarea id="question" name="question" maxlength="2000" required
-        placeholder="Ask about shipping, returns, refunds, warranty, promo codes or payments"></textarea>
+        placeholder="My contact date is YYYY-MM-DD. Ask about shipping, returns, refunds, warranty, promo codes or payments."></textarea>
       <div class="actions">
         <button id="send" type="submit">Send</button>
         <button id="reset" class="secondary" type="button">New question</button>
@@ -172,7 +172,9 @@
 
       const meta = el("div", "meta");
       meta.appendChild(el("span", "status " + data.status, data.status));
-      meta.appendChild(document.createTextNode(" · contact date " + data.resolved_contact_date));
+      meta.appendChild(document.createTextNode(data.resolved_contact_date
+        ? " · contact date " + data.resolved_contact_date
+        : " · contact date needed"));
       turn.appendChild(meta);
 
       if (data.calculation) {

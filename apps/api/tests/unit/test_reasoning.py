@@ -5,7 +5,6 @@ from datetime import date
 import pytest
 
 from policyguard.config import APP_ROOT, REPO_ROOT, Settings
-from policyguard.finance import FixedClock
 from policyguard.reasoning import (
     Evidence,
     ExtractiveReasoner,
@@ -43,7 +42,6 @@ def _service() -> PolicyService:
         settings=settings,
         retriever=retriever,
         reasoner=ExtractiveReasoner(),
-        clock=FixedClock(date(2026, 11, 14)),
     )
 
 
@@ -63,6 +61,7 @@ def test_validation_accepts_exact_quotes_and_builds_canonical_citation() -> None
     result = validate_model_output(output, evidence)
 
     assert result.status == "ANSWER"
+    assert result.answer == "The policy states the relevant rule."
     assert result.citations[0].filename == first.filename
     assert result.citations[0].section == first.section
     assert result.citations[0].id.startswith("NC-POL-")
@@ -108,7 +107,9 @@ def test_not_covered_uses_required_phrase() -> None:
 
 def test_service_uses_resolved_date_and_citations() -> None:
     service = _service()
-    request = AskRequest(question="What is the shipping fee for Metro cities?")
+    request = AskRequest(
+        question="My contact date is 2026-11-14. What is the shipping fee for Metro cities?"
+    )
 
     response = asyncio.run(service.ask(request, request_id="req-1"))
 
@@ -122,7 +123,9 @@ def test_service_uses_resolved_date_and_citations() -> None:
 
 def test_service_exposes_cod_conflict_in_offline_mode() -> None:
     service = _service()
-    request = AskRequest(question="What is the maximum cash on delivery order amount?")
+    request = AskRequest(
+        question="My contact date is 2026-11-14. What is the maximum cash on delivery order amount?"
+    )
 
     response = asyncio.run(service.ask(request, request_id="req-2"))
     filenames = {citation.filename for citation in response.citations}
@@ -135,7 +138,12 @@ def test_service_exposes_cod_conflict_in_offline_mode() -> None:
 
 def test_service_returns_not_covered_for_unrelated_question() -> None:
     service = _service()
-    request = AskRequest(question="What is the weather forecast on Mars?")
+    request = AskRequest(
+        question="What is the weather forecast on Mars?",
+        conversation=ConversationState(
+            facts=ConversationFacts(contact_date=date(2026, 11, 14)),
+        ),
+    )
 
     response = asyncio.run(service.ask(request, request_id="req-3"))
 
@@ -196,11 +204,77 @@ def test_new_message_contact_date_overrides_saved_date_without_mutating_request(
     [
         "My contact date is 2027-02-30. What is shipping?",
         "Contact date: 2026-11-14. Contact date: 2027-03-01. What is shipping?",
+        "My contact date is today. What is shipping?",
     ],
 )
 def test_invalid_or_conflicting_contact_dates_require_clarification(question: str) -> None:
-    response = asyncio.run(_service().ask(AskRequest(question=question), request_id="invalid-date"))
+    response = asyncio.run(
+        _service().ask(
+            AskRequest(
+                question=question,
+                conversation=ConversationState(
+                    facts=ConversationFacts(contact_date=date(2026, 11, 14)),
+                ),
+            ),
+            request_id="invalid-date",
+        )
+    )
 
     assert response.status == "CLARIFY"
     assert response.conversation.last_asked_field == "contact_date"
     assert response.citations == []
+    assert response.resolved_contact_date is None
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "What is the shipping fee for Metro cities?",
+        "My delivery date is 2027-03-01. What is the shipping fee?",
+        "My order date is 2027-03-01. What is the shipping fee?",
+        "My contact date is today. What is the shipping fee?",
+    ],
+)
+def test_missing_contact_date_clarifies_without_retrieval_or_model(question: str) -> None:
+    class UnusedRetriever:
+        def search(self, *args, **kwargs):
+            raise AssertionError("retrieval must wait for an explicit contact date")
+
+    class UnusedReasoner:
+        async def analyze(self, *args, **kwargs):
+            raise AssertionError("the model must not infer a missing contact date")
+
+    service = PolicyService(
+        settings=Settings(gemini_api_key=None),
+        retriever=UnusedRetriever(),
+        reasoner=UnusedReasoner(),
+    )
+    response = asyncio.run(service.ask(AskRequest(question=question), request_id="no-clock"))
+
+    assert response.status == "CLARIFY"
+    assert response.resolved_contact_date is None
+    assert response.conversation.facts.contact_date is None
+    assert response.conversation.original_question == question
+    assert response.conversation.last_asked_field == "contact_date"
+    assert response.citations == []
+
+
+def test_date_only_followup_answers_the_original_question() -> None:
+    service = _service()
+    first = asyncio.run(
+        service.ask(AskRequest(question="What is the Metro shipping fee?"), request_id="missing")
+    )
+
+    response = asyncio.run(
+        service.ask(
+            AskRequest(question="2027-03-01", conversation=first.conversation),
+            request_id="explicit-followup",
+        )
+    )
+
+    assert response.status == "ANSWER"
+    assert response.resolved_contact_date == date(2027, 3, 1)
+    assert response.conversation.original_question is None
+    assert any(
+        citation.filename == "21_shipping_fee_update_2027.md" for citation in response.citations
+    )

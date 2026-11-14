@@ -5,7 +5,7 @@ from datetime import date
 
 _CONTACT_DATE = re.compile(
     r"\bcontact[\s_-]+date\s*(?:(?:is|was)\b|[:=])?\s*"
-    r"(?P<date>\d{4}-\d{2}-\d{2})\b",
+    r"(?P<date>\d{4}-\d{2}-\d{2}|today|yesterday|tomorrow|last\s+week|next\s+week)\b",
     re.IGNORECASE,
 )
 _DATE_ONLY = re.compile(r"\s*(\d{4}-\d{2}-\d{2})[.!]?\s*")

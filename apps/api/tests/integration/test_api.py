@@ -45,6 +45,8 @@ def test_health_and_ui_routes() -> None:
         assert client.head("/").status_code == 200
         info = client.get("/api/v1/info").json()
         assert info["model_mode"] == "offline-extractive"
+        assert info["date_policy"] == "explicit_user_dates_only"
+        assert "resolved_server_date" not in info
 
 
 def test_ask_route_returns_service_response_and_request_id() -> None:
@@ -87,13 +89,35 @@ def test_real_app_loads_committed_index_and_answers() -> None:
         ready = client.get("/readyz")
         answer = client.post(
             "/api/v1/ask",
-            json={"question": "What is the shipping fee for Metro cities?"},
+            json={
+                "question": (
+                    "My contact date is 2026-11-14. What is the shipping fee for Metro cities?"
+                )
+            },
         )
 
     assert ready.status_code == 200
     assert ready.json()["documents"] == 22
     assert answer.status_code == 200
     assert answer.json()["citations"]
+
+
+def test_real_app_requires_contact_date_before_answering() -> None:
+    app = create_app(
+        settings=Settings(
+            gemini_api_key=None,
+            policies_dir=REPO_ROOT / "policies",
+            index_dir=APP_ROOT / "data" / "index",
+        )
+    )
+    with TestClient(app) as client:
+        response = client.post("/api/v1/ask", json={"question": "What is the Metro fee?"})
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "CLARIFY"
+    assert response.json()["resolved_contact_date"] is None
+    assert response.json()["conversation"]["last_asked_field"] == "contact_date"
+    assert response.json()["citations"] == []
 
 
 def test_body_size_limit_returns_413() -> None:

@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 import uuid
 from contextlib import asynccontextmanager
-from datetime import datetime
 from pathlib import Path
 
 from fastapi import FastAPI, Request
@@ -190,7 +189,7 @@ def create_app(
         return {
             "version": __version__,
             "timezone": runtime_settings.app_timezone,
-            "resolved_server_date": datetime.now(runtime_settings.timezone).date().isoformat(),
+            "date_policy": "explicit_user_dates_only",
             "model_mode": "gemini" if runtime_settings.has_gemini else "offline-extractive",
             "documents": manifest.document_count if manifest else None,
             "chunks": manifest.chunk_count if manifest else None,
