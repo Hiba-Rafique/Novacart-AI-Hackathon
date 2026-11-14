@@ -2,7 +2,7 @@ from datetime import date
 
 from fastapi.testclient import TestClient
 
-from policyguard.config import Settings
+from policyguard.config import APP_ROOT, REPO_ROOT, Settings
 from policyguard.main import create_app
 from policyguard.reasoning import ReasonerUnavailable
 from policyguard.schemas import (
@@ -71,6 +71,28 @@ def test_reasoner_failure_maps_to_503() -> None:
     assert response.status_code == 503
     assert response.json()["error"]["code"] == "MODEL_UNAVAILABLE"
     assert response.json()["error"]["retryable"] is True
+
+
+def test_real_app_loads_committed_index_and_answers() -> None:
+    app = create_app(
+        settings=Settings(
+            gemini_api_key=None,
+            policies_dir=REPO_ROOT / "policies",
+            index_dir=APP_ROOT / "data" / "index",
+        )
+    )
+
+    with TestClient(app) as client:
+        ready = client.get("/readyz")
+        answer = client.post(
+            "/api/v1/ask",
+            json={"question": "What is the shipping fee for Metro cities?"},
+        )
+
+    assert ready.status_code == 200
+    assert ready.json()["documents"] == 22
+    assert answer.status_code == 200
+    assert answer.json()["citations"]
 
 
 def test_body_size_limit_returns_413() -> None:

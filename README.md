@@ -142,4 +142,38 @@ Keep API keys in a `.env` file. It is already listed in `.gitignore`, so it will
 
 ---
 
+## PolicyGuard application
+
+The implementation lives in `apps/api`. It is a FastAPI service with BM25 retrieval,
+policy-exact finance/date helpers, citation validation, and a Gemini reasoning stage.
+Without `GEMINI_API_KEY`, it runs in a deterministic extractive mode so the demo still works.
+
+### Local commands
+
+```bash
+cd apps/api
+cp .env.example .env
+uv sync
+uv run python -m policyguard.ingest.cli
+uv run uvicorn policyguard.main:app --reload --host 0.0.0.0 --port 7860
+```
+
+Open `http://127.0.0.1:7860`. The health endpoints are `/healthz` and `/readyz`.
+Rebuild the index whenever a policy file changes, then commit `apps/api/data/index`.
+
+### Docker and Render
+
+```bash
+docker build -t novacart-policyguard:local .
+docker run --rm -p 7860:7860 --env-file apps/api/.env novacart-policyguard:local
+```
+
+`render.yaml` creates a Free Docker Web Service from this GitHub repository. Render injects
+`PORT=10000`; the container binds `0.0.0.0:$PORT`, and `render.yaml` deliberately does not set
+`PORT`. Add `GEMINI_API_KEY` in Render's environment settings as a secret (`sync: false`).
+The index and `policies/` are baked into the image because Free instances have ephemeral disks.
+The `/readyz` health check validates the committed index hashes without calling Gemini.
+
+---
+
 *Tech Fusion '26 · Innovate · Integrate · Inspire*

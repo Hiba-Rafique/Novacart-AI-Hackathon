@@ -1,0 +1,15 @@
+.git
+.github
+.moon/cache
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+**/*.pyc
+**/.env
+**/.env.*
+!**/.env.example
+**/tests
+**/test_*.py
+**/.DS_Store
+README-drafts
