@@ -161,6 +161,22 @@ uv run uvicorn policyguard.main:app --reload --host 0.0.0.0 --port 7860
 Open `http://127.0.0.1:7860`. The health endpoints are `/healthz` and `/readyz`.
 Rebuild the index whenever a policy file changes, then commit `apps/api/data/index`.
 
+#### Windows PowerShell
+
+From a PowerShell terminal, use the following commands for this checkout:
+
+```powershell
+Set-Location "D:\projec\hackathon\Novacart-AI-Hackathon\apps\api"
+uv sync --frozen
+uv run uvicorn policyguard.main:app --reload --host 127.0.0.1 --port 7860
+```
+
+The existing `apps/api/.env` already contains the local Gemini configuration; keep it.
+For a fresh checkout only, copy `.env.example` to `.env` and fill in `GEMINI_API_KEY`
+before starting the server. The committed index is ready to use without rebuilding it.
+Open <http://127.0.0.1:7860>; API documentation is at <http://127.0.0.1:7860/docs>.
+Keep the terminal open while using the app, and press `Ctrl+C` to stop it.
+
 ### Docker and Render
 
 ```bash
@@ -180,6 +196,40 @@ The container path overrides are required because the local `.env` uses host-rel
 `PORT`. Add `GEMINI_API_KEY` in Render's environment settings as a secret (`sync: false`).
 The index and `policies/` are baked into the image because Free instances have ephemeral disks.
 The `/readyz` health check validates the committed index hashes without calling Gemini.
+
+#### First Render deployment
+
+1. Push the committed application to this repository's `main` branch:
+   `git push origin main`.
+2. Sign in at <https://dashboard.render.com>, choose **New > Blueprint**, and connect
+   `Hiba-Rafique/Novacart-AI-Hackathon`. Authorize Render to access the repository if prompted.
+3. Select `main` and the root `render.yaml`. Keep the repository root as the Docker
+   build context; do not set the service root directory to `apps/api`.
+4. Review the proposed service: Docker runtime, Free plan, Singapore region, and
+   `/readyz` health check. The Dockerfile supplies the start command.
+5. Enter the value of `GEMINI_API_KEY` from your local `.env` when prompted. Render
+   does not receive your local `.env`, so the key must be entered separately.
+   Other settings come from `render.yaml`; leave `PORT` managed by Render.
+6. Apply the Blueprint and wait for the service deployment to become **Live**.
+   Open the actual `https://...onrender.com` URL shown by Render.
+
+Check the public service in PowerShell, replacing the placeholder with its actual URL:
+
+```powershell
+$baseUrl = "https://YOUR-SERVICE.onrender.com"
+Invoke-RestMethod "$baseUrl/readyz"
+Invoke-RestMethod "$baseUrl/api/v1/info"
+$body = @{ question = "What is the standard shipping fee for Metro cities?" } | ConvertTo-Json
+Invoke-RestMethod "$baseUrl/api/v1/ask" -Method Post -ContentType "application/json" -Body $body
+```
+
+Readiness should report 22 documents and 270 chunks, info should report
+`model_mode: gemini`, and the answer should include policy citations.
+The Free service can sleep after 15 minutes of inactivity, so the first request
+after an idle period can take about a minute. Later pushes to `main` automatically
+trigger deployment. A `503 MODEL_UNAVAILABLE` response calls for checking the
+Render Gemini key, model access, and quota; a failed `/readyz` calls for checking
+the deployment logs and the index/policy paths.
 
 ---
 
