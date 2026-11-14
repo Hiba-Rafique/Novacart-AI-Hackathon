@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 from typing import Protocol
 
@@ -11,7 +12,12 @@ from .tokenize import tokenize
 
 
 class Retriever(Protocol):
-    def search(self, query: str, top_k: int | None = None) -> list[RetrievedChunk]: ...
+    def search(
+        self,
+        query: str,
+        top_k: int | None = None,
+        max_effective_date: date | None = None,
+    ) -> list[RetrievedChunk]: ...
 
 
 class RetrievedChunk:
@@ -37,7 +43,12 @@ class BM25Retriever:
     def from_index(cls, index_dir: Path, default_top_k: int = 15) -> BM25Retriever:
         return cls(load_chunks(index_dir), default_top_k=default_top_k)
 
-    def search(self, query: str, top_k: int | None = None) -> list[RetrievedChunk]:
+    def search(
+        self,
+        query: str,
+        top_k: int | None = None,
+        max_effective_date: date | None = None,
+    ) -> list[RetrievedChunk]:
         query_tokens = tokenize(query, expand=True)
         if not query_tokens:
             return []
@@ -45,7 +56,15 @@ class BM25Retriever:
         limit = top_k if top_k is not None else self._default_top_k
         scores = self._bm25.get_scores(query_tokens)
         ranked = sorted(
-            ((index, float(score)) for index, score in enumerate(scores) if score > 0),
+            (
+                (index, float(score))
+                for index, score in enumerate(scores)
+                if score > 0
+                and (
+                    max_effective_date is None
+                    or self._chunks[index].effective_date <= max_effective_date
+                )
+            ),
             key=lambda pair: (-pair[1], self._chunks[pair[0]].chunk_id),
         )[:limit]
         return [
